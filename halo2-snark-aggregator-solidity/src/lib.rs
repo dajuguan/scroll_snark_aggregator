@@ -170,8 +170,8 @@ impl SolidityGenerate<Bn256> {
     }
 }
 
-pub struct MultiCircuitSolidityGenerate<'a, E: MultiMillerLoop> {
-    //pub target_circuits_params: [SolidityGenerate<E>; N],
+pub struct MultiCircuitSolidityGenerate<'a, E: MultiMillerLoop, const N:usize> {
+    pub target_circuits_params: [SolidityGenerate<E>; N],
     pub verify_params: &'a ParamsKZG<E>,
     pub verify_vk: &'a VerifyingKey<E::G1Affine>,
     // serialized instance
@@ -181,10 +181,12 @@ pub struct MultiCircuitSolidityGenerate<'a, E: MultiMillerLoop> {
     pub verify_public_inputs_size: usize,
 }
 
-impl<'a, E: MultiMillerLoop + Debug> MultiCircuitSolidityGenerate<'a, E> {
+impl<'a, E: MultiMillerLoop + Debug,const N:usize> MultiCircuitSolidityGenerate<'a, E, N> {
     pub fn call(&self, template_folder: std::path::PathBuf) -> String {
-        let target_circuit_s_g2 = get_xy_from_g2point::<E>(self.verify_params.s_g2());
-        let target_circuit_n_g2 = get_xy_from_g2point::<E>(-self.verify_params.g2());
+        // let target_circuit_s_g2 = get_xy_from_g2point::<E>(self.verify_params.s_g2());
+        // let target_circuit_n_g2 = get_xy_from_g2point::<E>(-self.verify_params.g2());
+        let target_circuit_s_g2 = get_xy_from_g2point::<E>(self.target_circuits_params[0].target_circuit_params.s_g2());
+        let target_circuit_n_g2 = get_xy_from_g2point::<E>(-self.target_circuits_params[0].target_circuit_params.g2());
 
         let verify_params = self.verify_params;
 
